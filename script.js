@@ -1,10 +1,17 @@
 'use strict';
 
-const p1Score = document.getElementById('score--0');
-const p1Current = document.getElementById('current--0');
-
-const p2Score = document.getElementById('score--1');
-const p2Current = document.getElementById('current--1');
+const players = [
+  {
+    section: document.querySelector('.player--0'),
+    score: document.getElementById('score--0'),
+    current: document.getElementById('current--0'),
+  },
+  {
+    section: document.querySelector('.player--1'),
+    score: document.getElementById('score--1'),
+    current: document.getElementById('current--1'),
+  },
+];
 
 const dice = document.querySelector('.dice');
 const newbtn = document.querySelector('.btn--new');
@@ -20,16 +27,53 @@ const diceImgs = [
   'dice-6.png',
 ];
 
-function rollHandler() {
-  let diceNum = Math.floor(Math.random() * 6) + 1;
-  const img = diceImgs[diceNum - 1];
-  dice.src = img;
+const winningScore = 100;
 
-  console.log(diceNum);
+//Game origin state
+let activePlayer = 0;
+let score = [0, 0];
+let currentScore = 0;
+let dicNum = 0;
+
+//funciton
+function change() {
+  currentScore = 0;
+  players[activePlayer].current.textContent = currentScore;
+  activePlayer = activePlayer == 0 ? 1 : 0;
+  players.forEach(p => {
+    p.section.classList.toggle('player--active');
+  });
 }
 
+function rollHandler() {
+  dicNum = Math.floor(Math.random() * 6) + 1;
+  currentScore += dicNum;
+  dice.src = diceImgs[dicNum - 1];
+  players[activePlayer].current.textContent = currentScore;
+  if (dicNum === 1) {
+    change();
+    console.log(activePlayer);
+  }
+}
+
+function holdHandler() {
+  score[activePlayer] += currentScore;
+  players[activePlayer].score.textContent = score[activePlayer];
+  currentScore = activePlayer;
+  change();
+}
+
+function newGame() {
+  activePlayer = 0;
+  score = [0, 0];
+  currentScore = 0;
+  dicNum = 0;
+  change();
+}
+
+newbtn.addEventListener('click', newGame);
 rollbtn.addEventListener('click', rollHandler);
+holdbtn.addEventListener('click', holdHandler);
 
 /*
-如何綁定dice圖片到1~6隨機數
-*/
+ */
