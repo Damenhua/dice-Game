@@ -34,6 +34,7 @@ let activePlayer = 0;
 let score = [0, 0];
 let currentScore = 0;
 let dicNum = 0;
+let isPlaying = true;
 
 //funciton
 function change() {
@@ -46,21 +47,30 @@ function change() {
 }
 
 function rollHandler() {
+  if (!isPlaying) return;
+
   dicNum = Math.floor(Math.random() * 6) + 1;
-  currentScore += dicNum;
   dice.src = diceImgs[dicNum - 1];
+  currentScore += dicNum;
   players[activePlayer].current.textContent = currentScore;
   if (dicNum === 1) {
     change();
-    console.log(activePlayer);
   }
 }
 
 function holdHandler() {
+  if (!isPlaying) return;
+
   score[activePlayer] += currentScore;
   players[activePlayer].score.textContent = score[activePlayer];
-  currentScore = activePlayer;
-  change();
+
+  if (score[activePlayer] >= winningScore) {
+    isPlaying = false;
+    players[activePlayer].section.classList.add('player--winner');
+    players[activePlayer].section.classList.remove('player--active');
+  } else {
+    change();
+  }
 }
 
 function newGame() {
@@ -68,7 +78,14 @@ function newGame() {
   score = [0, 0];
   currentScore = 0;
   dicNum = 0;
-  change();
+  isPlaying = true;
+
+  players.forEach((p, index) => {
+    p.score.textContent = '0';
+    p.current.textContent = '0';
+    p.section.classList.toggle('player--active', index === 0);
+    p.section.classList.remove('player--winner');
+  });
 }
 
 newbtn.addEventListener('click', newGame);
